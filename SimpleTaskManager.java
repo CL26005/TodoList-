@@ -195,22 +195,38 @@ public class SimpleTaskManager {
         String taskNumber = scanner.nextLine();
 
         boolean found = false;
-        for (int i=0; i<tasks.size(); i++) {
-            if (taskNumber.equals(tasks.get(i)[7])) {
-                if ((tasks.get(i)[8].equals("|"))) {
-                    markTask(taskNumber);
-                } else {
-                    tasks.get(i)[5] = "Complete";
-                    System.out.println("Task \"" + tasks.get(i)[0] + "\" marked as complete!");
+        for (String[] task : tasks) {
+            if (taskNumber.equals(task[7])) {
+                if (task[8].equals("|")) {
+                    task[5] = "Complete";
+                    System.out.println("Task \"" + task[0] + "\" marked as complete!");
                     found = true;
-                    if (!(tasks.get(i)[6].equals("None")))
-                        isRecurring(i);
+                } else {
+                    String[] dependencies = task[8].split("\\|");
+                    boolean allDependenciesComplete = true;
+                    for (String dependency : dependencies) {
+                        if (!dependency.isEmpty()) {
+                            String[] depTask = findTaskById(dependency);
+                            if (depTask != null && depTask[5].equals("Incomplete")) {
+                                allDependenciesComplete = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (allDependenciesComplete) {
+                        task[5] = "Complete";
+                        System.out.println("Task \"" + task[0] + "\" marked as complete!");
+                        found = true;
+                    } else {
+                        System.out.println("Warning: Task \"" + task[0] + "\" cannot be marked as complete because it depends on incomplete tasks.");
+                    }
                 }
             }
         }
         if (!found) {
             System.out.println("Invalid task number!");
         }
+    
     }
 
     static void deleteTask() {
@@ -237,9 +253,12 @@ public class SimpleTaskManager {
         if (tasks.isEmpty()) {
             System.out.println("No tasks available.");
         } else {
-            for (int i = 0; i < tasks.size(); i++) {
-                String[] task = tasks.get(i);
-                System.out.printf("%3d.  Task ID: %-3s %-35s [ Description: %-15s Due: %-12s Category: %-10s Priority: %-7s]  (%s)\n",(i+1), task[7], task[0], task[1], task[2], task[3], task[4], task[5]);
+            for (String[] task : tasks) {
+                System.out.printf("Task ID: %-3s %-35s [ Description: %-15s Due: %-12s Category: %-10s Priority: %-7s]  (%s)\n",
+                        task[7], task[0], task[1], task[2], task[3], task[4], task[5]);
+                if (!task[8].equals("|")) {
+                    System.out.println("   Depends on: " + task[8].replace("|", ", "));
+                }
             }
         }
     }
@@ -396,158 +415,64 @@ public class SimpleTaskManager {
     }
 
     static void taskDependencies() {
-        System.out.println("=== Set Task Dependencies ===");
-        viewTasks();
-        String dependentTaskNumber = "";
-        String precedingTaskNumber = "";
+        System.out.println("\n=== Task Dependencies ===");
+        System.out.print("Enter task number that depends on another task: ");
+        String dependentTaskId = scanner.nextLine();
+        System.out.print("Enter the task number it depends on: ");
+        String precedingTaskId = scanner.nextLine();
 
-        while (true) {
-            boolean found = false;
-//            int num=0;
-            while (!found) {
-                System.out.print("Enter the task ID that depends on another task: ");
-                dependentTaskNumber = scanner.nextLine();
+        String[] dependentTask = findTaskById(dependentTaskId);
+        String[] precedingTask = findTaskById(precedingTaskId);
 
-                for (int i=0; i<tasks.size(); i++) {
-                    if (dependentTaskNumber.equals(tasks.get(i)[7])) {
-                        found = true;
-//                        num = i;
-                    }
+        if (dependentTask != null && precedingTask != null) {
+            if (hasCycle(dependentTaskId, precedingTaskId)) {
+                System.out.println("Error: Adding this dependency would create a cycle.");
+            } else {
+                if (dependentTask[8].equals("|")) {
+                    dependentTask[8] = precedingTaskId;
+                } else {
+                    dependentTask[8] += "|" + precedingTaskId;
                 }
-                if (!found) {
-                    System.out.println("Invalid task number! Please try again.");
-                }
+                System.out.println("Task \"" + dependentTask[0] + "\" now depends on \"" + precedingTask[0] + "\".");
             }
-
-            found = false;
-//            int num=0;
-            while (!found) {
-                System.out.print("Enter the task ID that the task depends on: ");
-                precedingTaskNumber = scanner.nextLine();
-
-                for (int i=0; i<tasks.size(); i++) {
-                    if (precedingTaskNumber.equals(tasks.get(i)[7])) {
-                        found = true;
-//                        num = i;
-                    }
-                }
-                if (!found) {
-                    System.out.println("Invalid task number! Please try again.");
-                }
-            }
-
-            if (dependentTaskNumber.equalsIgnoreCase(precedingTaskNumber)) {
-                System.out.println("Error: A task cannot depend on itself. Please try again.");
-                continue;
-            }
-
-            int depentNum = Integer.parseInt(dependentTaskNumber);
-            int precedingNum = Integer.parseInt(precedingTaskNumber);
-            
-            if (isCyclic(depentNum, precedingNum)) {
-                System.out.println("Error: This dependency creates a cycle. Please try again.");
-                continue;
-            }
-
-            // Add the dependency
-            String[] task = tasks.get(depentNum);
-            HashSet<String> dependencies = new HashSet<>(Arrays.asList(task[8].split("\\|")));
-            dependencies.add(String.valueOf(precedingTaskNumber));
-            task[8] = String.join("|", dependencies);
-
-            System.out.println("Task \"" + tasks.get(depentNum)[0] + "\" now depends on \"" + tasks.get(precedingNum)[0] + "\".");
-            break;
+        } else {
+            System.out.println("Invalid task number!");
         }
     }
 
-    private static boolean isCyclic(int dependentTaskNumber, int precedingTaskNumber) {
-        ArrayList<Integer> visited = new ArrayList<>();
-        return hasCycle(dependentTaskNumber, precedingTaskNumber, visited);
+    static boolean hasCycle(String dependentTaskId, String precedingTaskId) {
+        HashSet<String> visited = new HashSet<>();
+        return hasCycleUtil(precedingTaskId, dependentTaskId, visited);
     }
 
-    private static boolean hasCycle(int currentTaskNumber, int taskToCheckNumber, ArrayList<Integer> visited) {
-        // Base case: if the current task is the same as the task we are checking for
-        if (currentTaskNumber == taskToCheckNumber) {
-            return true; // Cycle detected
+    static boolean hasCycleUtil(String currentTaskId, String targetTaskId, HashSet<String> visited) {
+        if (currentTaskId.equals(targetTaskId)) {
+            return true;
         }
-
-        // If the task is already visited, no cycle found from this path
-        if (visited.contains(currentTaskNumber)) {
-            return false; // Prevent redundant checks
-        }
-
-        // Mark the current task as visited
-        visited.add(currentTaskNumber);
-
-        // Get the current task and its dependencies
-        String[] currentTask = tasks.get(currentTaskNumber);
-        if (currentTask.length < 2) {
-            // If there are no dependencies for the current task, no cycle is possible
-            visited.remove((Integer) currentTaskNumber);
+        if (visited.contains(currentTaskId)) {
             return false;
         }
+        visited.add(currentTaskId);
 
-        // Parse the dependencies
-        HashSet<String> dependencies = new HashSet<>(Arrays.asList(currentTask[8].split("\\|")));
-
-        // Iterate over dependencies and check for cycles
-        for (String dependency : dependencies) {
-            // Find the index of the dependency in the tasks list
-            int dependentTaskIndex = -1;
-            for (int i = 0; i < tasks.size(); i++) {
-                if (tasks.get(i)[0].equals(dependency)) {
-                    dependentTaskIndex = i;
-                    break;
-                }
-            }
-
-            // If the dependency exists in tasks, check recursively for a cycle
-            if (dependentTaskIndex != -1) {
-                if (hasCycle(dependentTaskIndex, taskToCheckNumber, visited)) {
-                    return true; // Cycle detected
+        String[] currentTask = findTaskById(currentTaskId);
+        if (currentTask != null && !currentTask[8].equals("|")) {
+            String[] dependencies = currentTask[8].split("\\|");
+            for (String dependency : dependencies) {
+                if (!dependency.isEmpty() && hasCycleUtil(dependency, targetTaskId, visited)) {
+                    return true;
                 }
             }
         }
-
-        // Backtrack by removing the current task from visited
-        visited.remove((Integer) currentTaskNumber);
-        return false; // No cycle detected
+        return false;
     }
-    
-    static void markTask(String taskNumber) {
-        boolean notValid = true;
-        int taskNum = Integer.parseInt(taskNumber); 
-        while (notValid) {
-//            System.out.println("=== Mark Task as Complete ===");
-//            viewTasks();
-            try {
-//                System.out.print("Enter the task number you want to mark as complete: ");
-//                int taskNumber = Integer.parseInt(scanner.nextLine()) - 1;
-//
-//                if (taskNumber < 0 || taskNumber >= tasks.size()) {
-//                    System.out.println("Invalid task number! Please try again.");
-//                    continue;
-//                }
-                // Check if the task has dependencies that are incomplete
-                if (tasks.containsKey(taskNumber)) {
-                    for (int dependentTask=0; dependentTask<tasks.size(); dependentTask++) {
-                        if (tasks.get(dependentTask)[2].equals("Incomplete")) {
-                            System.out.println("\nWarning: Task \"" + tasks.get(taskNum)[0] +
-                                    "\" cannot be marked as complete because it depends on \"" +
-                                    tasks.get(dependentTask)[0] + "\". Please complete the dependent task first.");
-                            notValid = true;
-                            break;
-                        }
-                    }
-                }
-                // Mark the task as complete
-                tasks.get(taskNum)[2] = "Complete";
-                System.out.println("Task \"" + tasks.get(taskNum)[0] + "\" marked as complete!");
-                notValid = false; // Exit loop as task is marked
-            } catch (NumberFormatException e) {
-                System.out.println("Error: Please enter a valid task number.");
+
+    static String[] findTaskById(String taskId) {
+        for (String[] task : tasks) {
+            if (task[7].equals(taskId)) {
+                return task;
             }
         }
+        return null;
     }
        
     static void editTask(){
@@ -703,4 +628,3 @@ public class SimpleTaskManager {
         }
     }
 }
-
