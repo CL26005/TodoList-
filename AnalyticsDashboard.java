@@ -1,6 +1,5 @@
-package test;
+
 import java.util.ArrayList;
-import todolist.Task;
 
 public class AnalyticsDashboard {
     public static void main(String[] args) {
@@ -8,22 +7,17 @@ public class AnalyticsDashboard {
         ArrayList<Task> tasks = new ArrayList<>();
 
         // Add some sample tasks
-        tasks.add(new Task("Math Homework", "Complete Math Exercises","2024-10-15","Homework","High","Complete"));
-        tasks.add(new Task("Buy Groceries","Buy milk and bread","2024-10-16","Personal","Medium","Incomplete"));
-        tasks.add(new Task("Finish Report","Complete the project report","2024-10-17","Work","High","Complete"));
-        tasks.add(new Task("Science Assignment","Write a lab report","2024-10-18","Homework","Medium","Incomplete"));
-        tasks.add(new Task("Exercise","Go for a run","2024-10-19","Personal","Low","Incomplete"));
+        tasks.add(new Task("Math Homework", true, "Homework"));
+        tasks.add(new Task("Buy Groceries", false, "Personal"));
+        tasks.add(new Task("Finish Report", true, "Work"));
+        tasks.add(new Task("Science Assignment", false, "Homework"));
+        tasks.add(new Task("Exercise", false, "Personal"));
 
         // Step 2: Call the analytics function
         showAnalytics(tasks);
     }
 
     public static void showAnalytics(ArrayList<Task> tasks) {
-        if(tasks == null){
-            System.out.println("Error: Task list is null.");
-            return;
-        }
-        
         int totalTasks = tasks.size();
         int completed = 0;
         int pending = 0;
@@ -33,31 +27,22 @@ public class AnalyticsDashboard {
 
         // Step 3: Process each task
         for (Task task : tasks) {
-            if (task == null) {
-                System.out.println("Warning: Found a null task in the list.");
-                continue;
-            }
-            
-            //check if the task is completed
-            if ("Complete".equalsIgnoreCase(task.getStatus())){
+            if (task.isCompleted()) {
                 completed++;
-            } else{
+            } else {
                 pending++;
             }
 
             // Count tasks by category
-            switch (task.getCategory().toLowerCase()) {
-                case "homework":
+            switch (task.getCategory()) {
+                case "Homework":
                     homework++;
                     break;
-                case "personal":
+                case "Personal":
                     personal++;
                     break;
-                case "work":
+                case "Work":
                     work++;
-                    break;
-                default:
-                    System.out.println("Unknown category: " + task.getCategory());
                     break;
             }
         }
