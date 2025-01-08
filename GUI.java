@@ -1,4 +1,4 @@
-package test;
+package todolist;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
