@@ -5,6 +5,7 @@ A Java-based To-Do List Application developed for WIX1002 Fundamentals of Progra
 This project demonstrates fundamental programming concepts, object-oriented principles, data persistence, and basic user interface design.
 
 ✨ Features
+
 ✅ Core Features
 
 Task Creation – Add tasks with:
@@ -75,3 +76,31 @@ java Main
 
 
 Tasks will be saved to and loaded from tasks.csv automatically.
+
+📊 Sample Analytics Output
+Total Tasks: 10
+Completed Tasks: 6
+Pending Tasks: 4
+Completion Rate: 60%
+Category Breakdown:
+- Homework: 3
+- Work: 5
+- Personal: 2
+
+👩‍💻 Contributors
+
+Lai Zhi Hang (24066429)
+
+Gianina Lazaroo (24066775)
+
+Kwek Chee Ling (23080328)
+
+Lee Yu Xuan (23098783)
+
+Mah Kah Mun (24004590)
+
+
+📜 License
+
+This project is for educational purposes under WIX1002 (Fundamentals of Programming).
+Feel free to use it as a reference or learning material.
