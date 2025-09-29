@@ -12,7 +12,6 @@ This project demonstrates fundamental programming concepts, object-oriented desi
 ---
 
 ## 📂 Project Structure
-
 ├── AnalyticsDashboard.java # Provides task statistics & analytics
 ├── GUI.java # JavaFX-based graphical user interface
 ├── SimpleTaskManager.java # Command-line interface & task manager
@@ -20,10 +19,6 @@ This project demonstrates fundamental programming concepts, object-oriented desi
 ├── TaskStorage.java # Handles saving/loading tasks from CSV
 ├── tasks.csv # Stores task data
 └── README.md # Project documentation
-
-markdown
-Copy code
-
 ---
 
 ## ✨ Features
@@ -70,7 +65,9 @@ Copy code
 ```bash
 git clone https://github.com/CL26005/todo.git
 cd todo
-2. Prerequisites
+```
+
+### 2. Prerequisites
 Java JDK 11 or higher
 
 JavaFX SDK configured in your IDE
@@ -79,7 +76,7 @@ JavaMail libraries (for email notifications)
 
 (Optional) Internet access for email features
 
-3. Build & Run
+### 3. Build & Run
 Run GUI Version
 bash
 Copy code
@@ -93,7 +90,7 @@ java SimpleTaskManager
 Note: The tasks.csv file in the repo will be used to load existing tasks.
 Make sure the file is in the working directory or adjust path accordingly.
 
-🧪 Example Analytics Output
+### 🧪 Example Analytics Output
 yaml
 Copy code
 Total Tasks: 10  
@@ -104,17 +101,18 @@ Category Breakdown:
 - Homework: 3  
 - Work: 5  
 - Personal: 2  
-👥 Contributors
-Lai Zhi Hang (24066429)
 
-Gianina Lazaroo (24066775)
+### 👥 Contributors
+Lai Zhi Hang 
 
-Kwek Chee Ling (23080328)
+Gianina Lazaroo 
 
-Lee Yu Xuan (23098783)
+Kwek Chee Ling 
 
-Mah Kah Mun (24004590)
+Lee Yu Xuan 
 
-📜 License
+Mah Kah Mun 
+
+###📜 License
 This project is for educational purposes under the course WIX1002 Fundamentals of Programming.
 You may use it as a reference or for learning, but please do not use it commercially without permission.
