@@ -47,8 +47,8 @@ public class Mail {
     }
 
     public static void sendEmailReminder(String toEmail, Task task) {
-        final String fromEmail = "kwekcheeling@gmail.com";  
-        final String password = "cblhjkvpbjzvpgib";         
+        final String fromEmail = "your_email@gmail.com";  
+        final String password = "your_password";         
 
         // SMTP server settings
         Properties props = new Properties();
@@ -109,4 +109,5 @@ public class Mail {
             e.printStackTrace();
         }
     }
+
 }
