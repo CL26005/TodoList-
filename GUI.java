@@ -175,8 +175,8 @@ public class GUI extends Application {
             return;
         }
 
-        String fromUser = "kwekcheeling@gmail.com"; 
-        String fromUserPassword = "cblhjkvpbjzvpgib";
+        String fromUser = "your_email@gmail.com"; 
+        String fromUserPassword = "your_password";
         Properties properties = System.getProperties();
         properties.put("mail.smtp.port", "587");
         properties.put("mail.smtp.auth", "true");
@@ -245,3 +245,4 @@ public class GUI extends Application {
         }
     }
 }
+
